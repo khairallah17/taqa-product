@@ -23,15 +23,15 @@ export const ServiceFilter = ({
   onServiceChange,
 }: ServiceFilterProps) => {
   return (
-    <div className="">
-      <p className="text-xl md:text-2xl lg:text-3xl font-medium text-black mb-4 md:mb-6">
+    <div className="w-full">
+      <p className="text-lg sm:text-xl md:text-2xl lg:text-3xl font-medium text-black mb-3 sm:mb-4 md:mb-6">
         Filtre par métier :
       </p>
       <div className="flex flex-wrap gap-6 w-full items-center">
         {services.map((service) => (
           <div
             key={service.id}
-            className={`bg-[#003d553b] text-white px-4 py-2 rounded-md cursor-pointer transition-all duration-300 ${
+            className={`bg-[#003d553b] text-white px-3 py-2 sm:px-4 sm:py-2 md:px-5 md:py-3 rounded-md cursor-pointer transition-all duration-300 text-sm sm:text-base md:text-lg hover:bg-[#003D55] ${
               currentService === service.name ? "!bg-[#003D55]" : ""
             }`}
             onClick={() => onServiceChange(service.name)}

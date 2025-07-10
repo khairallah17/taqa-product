@@ -7,6 +7,7 @@ export default defineConfig(({ mode }) => ({
   server: {
     host: "::",
     port: 8080,
+    allowedHosts: ["taqasolutions.me"], // 👈 Add this line
   },
   plugins: [react()],
   resolve: {

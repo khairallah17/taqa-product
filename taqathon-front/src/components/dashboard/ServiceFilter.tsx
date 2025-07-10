@@ -18,13 +18,16 @@ const services: ServiceOption[] = [
   { id: 5, name: "EL", label: "EL" },
 ];
 
-export const ServiceFilter = ({ currentService, onServiceChange }: ServiceFilterProps) => {
+export const ServiceFilter = ({
+  currentService,
+  onServiceChange,
+}: ServiceFilterProps) => {
   return (
     <div className="">
       <p className="text-xl md:text-2xl lg:text-3xl font-medium text-black mb-4 md:mb-6">
         Filtre par métier :
       </p>
-      <div className="flex gap-6 w-full items-center">
+      <div className="flex flex-wrap gap-6 w-full items-center">
         {services.map((service) => (
           <div
             key={service.id}
@@ -39,4 +42,4 @@ export const ServiceFilter = ({ currentService, onServiceChange }: ServiceFilter
       </div>
     </div>
   );
-}; 
+};

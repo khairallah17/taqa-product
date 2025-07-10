@@ -2,14 +2,20 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { AlertTriangle, Flame } from "lucide-react";
 import { Link } from "react-router-dom";
-import { useDashboardTranslations, useTranslations } from "@/i18n/hooks/useTranslations";
+import {
+  useDashboardTranslations,
+  useTranslations,
+} from "@/i18n/hooks/useTranslations";
 
 interface CriticalAlertProps {
   criticalAnomalies: number;
   highPriorityAnomalies: number;
 }
 
-export const CriticalAlert = ({ criticalAnomalies, highPriorityAnomalies }: CriticalAlertProps) => {
+export const CriticalAlert = ({
+  criticalAnomalies,
+  highPriorityAnomalies,
+}: CriticalAlertProps) => {
   const dashboardT = useDashboardTranslations();
   const { t } = useTranslations();
 
@@ -27,7 +33,7 @@ export const CriticalAlert = ({ criticalAnomalies, highPriorityAnomalies }: Crit
               <div className="absolute inset-0 bg-status-critical/30 rounded-xl animate-ping" />
             </div>
             <div>
-              <h3 className="font-heading font-bold text-lg text-status-critical mb-1">
+              <h3 className="font-heading font-bold text-xs xl:text-lg text-status-critical mb-1">
                 {dashboardT.criticalAlert}
               </h3>
               <p className="text-muted-foreground font-medium">
@@ -53,4 +59,4 @@ export const CriticalAlert = ({ criticalAnomalies, highPriorityAnomalies }: Crit
       </CardContent>
     </Card>
   );
-}; 
+};

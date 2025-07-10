@@ -6,12 +6,8 @@ import {
   Plus,
   Calendar,
   Archive,
-  BarChart3,
   Settings,
   X,
-  Zap,
-  Wrench,
-  FileText,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -22,6 +18,7 @@ import { useNavigationTranslations } from "@/i18n/hooks/useTranslations";
 
 import TaqaLogo from "@/assets/taqa-logo.svg";
 import { useMaintenanceStore } from "@/(zustand)/useMaintenanceStore";
+import { useAnomalyStore } from "@/(zustand)/useAnomalyStore";
 
 interface SidebarProps {
   open: boolean;
@@ -56,6 +53,7 @@ const Sidebar = ({ open, onClose }: SidebarProps) => {
   const [anomaliesCount, setAnomaliesCount] = useState(0);
   const [maintenanceWindowsCount, setMaintenanceWindowsCount] = useState(0);
   const { maintenanceWindows } = useMaintenanceStore();
+  const { anomalies } = useAnomalyStore();
 
   useEffect(() => {
     const getCount = async () => {
@@ -67,7 +65,7 @@ const Sidebar = ({ open, onClose }: SidebarProps) => {
       setMaintenanceWindowsCount(maintenanceWindowsCount);
     };
     getCount();
-  }, [maintenanceWindows]);
+  }, [maintenanceWindows, anomalies]);
 
   const navigation = [
     {

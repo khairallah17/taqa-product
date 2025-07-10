@@ -1,22 +1,2 @@
-__pycache__/
-*.py[cod]
-*$py.class
-bin/
-include/
-lib/*
-lib64/
-pyvenv.cfg
-.env
-.venv
-env/
-venv/
-ENV/
-.DS_Store
-.env
-.venv
-env/
-venv/
-ENV/
-.DS_Store
-.env
-.venv
+# Created by venv; see https://docs.python.org/3/library/venv.html
+*

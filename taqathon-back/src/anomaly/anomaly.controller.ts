@@ -26,6 +26,7 @@ import { Express } from 'express';
 import { MaintenanceWindowsService } from 'src/maintenance-windows/maintenance-windows.service';
 import axios from 'axios';
 import * as fs from 'fs';
+import * as XLSX from 'xlsx';
 import {
   ApiBody,
   ApiOperation,
@@ -73,6 +74,7 @@ interface ExternalAnomalyData {
 
 interface ExternalApiResponse {
   results: ExternalAnomalyData[];
+  error?: string;
 }
 
 @Controller('anomaly')
@@ -85,21 +87,216 @@ export class AnomalyController {
     private readonly maintainanceWindowService: MaintenanceWindowsService
   ) {}
 
+  /**
+   * Helper method to convert anomaly data to Excel format
+   */
+  private createExcelFromAnomalyData(
+    anomalyData: Prisma.AnomalyCreateInput
+  ): Buffer {
+    // Map the anomaly data to the expected format for the ML model
+    const excelData = [
+      {
+        'Section propriétaire': anomalyData.service || '',
+        "Description de l'équipement": anomalyData.equipementDescription || '',
+        "Date de détéction de l'anomalie": anomalyData.detectionDate
+          ? new Date(anomalyData.detectionDate).toISOString()
+          : new Date().toISOString(),
+        Description: anomalyData.description || '',
+        Systeme: anomalyData.system || '',
+        Num_equipement: anomalyData.equipment || '',
+      },
+    ];
+
+    // Create workbook and worksheet
+    const workbook = XLSX.utils.book_new();
+    const worksheet = XLSX.utils.json_to_sheet(excelData);
+
+    // Add worksheet to workbook
+    XLSX.utils.book_append_sheet(workbook, worksheet, 'Anomalies');
+
+    // Generate buffer from workbook
+    const excelBuffer = XLSX.write(workbook, {
+      type: 'buffer',
+      bookType: 'xlsx',
+    }) as Buffer;
+
+    return excelBuffer;
+  }
+
+  /**
+   * Helper method to send Excel data for prediction
+   */
+  private async sendForPrediction(
+    excelBuffer: Buffer,
+    originalFilename: string = 'anomaly_data.xlsx'
+  ) {
+    try {
+      const formData = new FormData();
+      formData.append('file', new Blob([excelBuffer]), originalFilename);
+
+      const response = await axios.post(
+        'http://fastapi:3000/predict',
+        formData,
+        {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          },
+        }
+      );
+
+      return response.data as ExternalApiResponse;
+    } catch (error) {
+      console.error('Error sending data for prediction:', error);
+      throw new BadRequestException(
+        'Failed to get predictions from ML service'
+      );
+    }
+  }
+
   @Post()
-  @ApiOperation({ summary: 'Create anomaly' })
+  @ApiOperation({ summary: 'Create anomaly with optional ML predictions' })
   @ApiBody({ type: CreateAnomalyDto })
+  @ApiQuery({
+    name: 'predict',
+    required: false,
+    type: Boolean,
+    description: 'Whether to send data for ML prediction before saving',
+    example: false,
+  })
   @ApiResponse({
     status: 200,
-    type: Anomaly, // for a list
-    description: 'List of anomalies',
+    type: Anomaly,
+    description: 'Created anomaly with optional predictions',
   })
-  async create(@Body() createAnomalyObj: Prisma.AnomalyCreateInput) {
+  async create(
+    @Body() createAnomalyObj: Prisma.AnomalyCreateInput,
+    @Query('predict') predict?: boolean
+  ) {
     try {
-      const anomaly = await this.anomalyService.create(createAnomalyObj);
-      return anomaly;
+      let finalAnomalyData = createAnomalyObj;
+
+      // If predict=true, generate Excel and get predictions
+      if (predict === true) {
+        try {
+          // Generate Excel from anomaly data
+          const excelBuffer = this.createExcelFromAnomalyData(createAnomalyObj);
+
+          // Send for prediction
+          const predictionResponse = await this.sendForPrediction(excelBuffer);
+
+          // Check if prediction was successful
+          if (predictionResponse.error) {
+            console.warn(
+              'Prediction service returned error:',
+              predictionResponse.error
+            );
+          } else if (
+            predictionResponse.results &&
+            Array.isArray(predictionResponse.results) &&
+            predictionResponse.results.length > 0
+          ) {
+            const predictions = predictionResponse.results[0]?.predictions;
+
+            if (predictions) {
+              // Update anomaly data with predictions
+              finalAnomalyData = {
+                ...createAnomalyObj,
+                predictedIntegrity: predictions['Fiabilité Intégrité'] || null,
+                predictedDisponibility: predictions['Disponibilité'] || null,
+                predictedProcessSafety: predictions['Process Safety'] || null,
+                predictionsData: predictions,
+              };
+            }
+          }
+        } catch (predictionError) {
+          console.warn(
+            'Failed to get predictions, proceeding without them:',
+            predictionError
+          );
+          // Continue with original data if prediction fails
+        }
+      }
+
+      const anomaly = await this.anomalyService.create(finalAnomalyData);
+      return {
+        ...anomaly,
+        predictionUsed: predict === true,
+      };
     } catch (error) {
       console.error('Error creating anomaly:', error);
       throw new InternalServerErrorException('Failed to create anomaly');
+    }
+  }
+
+  @Post('/create-with-prediction')
+  @ApiOperation({
+    summary: 'Create anomaly with mandatory ML predictions',
+    description:
+      'Creates an Excel file from anomaly data, sends it to ML service for predictions, and saves the anomaly with predictions',
+  })
+  @ApiBody({ type: CreateAnomalyDto })
+  @ApiResponse({
+    status: 201,
+    type: Anomaly,
+    description: 'Created anomaly with ML predictions',
+  })
+  @ApiResponse({
+    status: 400,
+    description: 'Bad request - Failed to get predictions or create anomaly',
+  })
+  async createWithPrediction(
+    @Body() createAnomalyObj: Prisma.AnomalyCreateInput
+  ) {
+    try {
+      // Generate Excel from anomaly data
+      const excelBuffer = this.createExcelFromAnomalyData(createAnomalyObj);
+
+      // Send for prediction
+      const predictionResponse = await this.sendForPrediction(excelBuffer);
+
+      let finalAnomalyData = createAnomalyObj;
+
+      // Check if prediction was successful and update anomaly data
+      if (predictionResponse.error) {
+        throw new BadRequestException(
+          `ML prediction service error: ${predictionResponse.error}`
+        );
+      }
+
+      if (
+        predictionResponse.results &&
+        Array.isArray(predictionResponse.results) &&
+        predictionResponse.results.length > 0
+      ) {
+        const predictions = predictionResponse.results[0]?.predictions;
+
+        if (predictions) {
+          // Update anomaly data with predictions
+          finalAnomalyData = {
+            ...createAnomalyObj,
+            predictedIntegrity: predictions['Fiabilité Intégrité'] || null,
+            predictedDisponibility: predictions['Disponibilité'] || null,
+            predictedProcessSafety: predictions['Process Safety'] || null,
+            predictionsData: predictions,
+          };
+        }
+      }
+
+      const anomaly = await this.anomalyService.create(finalAnomalyData);
+
+      return {
+        ...anomaly,
+        predictionUsed: true,
+        excelGenerated: true,
+      };
+    } catch (error) {
+      console.error('Error creating anomaly with prediction:', error);
+      if (error instanceof BadRequestException) {
+        throw error;
+      }
+      throw new InternalServerErrorException(
+        'Failed to create anomaly with prediction'
+      );
     }
   }
 
@@ -840,11 +1037,11 @@ export class AnomalyController {
       };
     } catch (error: any) {
       console.log('error', error);
-      
+
       if (error instanceof BadRequestException) {
         throw error;
       }
-      
+
       throw new InternalServerErrorException(
         `Failed to process file: ${error.message || 'Unknown error'}`
       );

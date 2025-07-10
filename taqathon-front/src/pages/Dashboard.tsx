@@ -72,8 +72,6 @@ interface DashboardData {
   maintenanceWindowUtilization: number;
 }
 
-
-
 const Dashboard = () => {
   // All hooks must be called at the top level
   const [dashboardData, setDashboardData] = useState<DashboardData | null>(
@@ -141,10 +139,10 @@ const Dashboard = () => {
   // Show loading state while fetching data
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-taqa-primary mx-auto"></div>
-          <p className="mt-4 text-lg">Loading dashboard...</p>
+      <div className="flex items-center justify-center min-h-screen px-4">
+        <div className="text-center max-w-md mx-auto">
+          <div className="animate-spin rounded-full h-16 w-16 sm:h-24 sm:w-24 lg:h-32 lg:w-32 border-b-2 border-taqa-primary mx-auto"></div>
+          <p className="mt-4 text-base sm:text-lg">Loading dashboard...</p>
         </div>
       </div>
     );
@@ -153,11 +151,13 @@ const Dashboard = () => {
   // Show error state if no data
   if (!dashboardData) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="text-center">
-          <AlertTriangle className="h-16 w-16 text-red-500 mx-auto mb-4" />
-          <h2 className="text-2xl font-bold mb-2">Failed to load dashboard</h2>
-          <p className="text-muted-foreground mb-4">
+      <div className="flex items-center justify-center min-h-screen px-4">
+        <div className="text-center max-w-md mx-auto">
+          <AlertTriangle className="h-12 w-12 sm:h-16 sm:w-16 text-red-500 mx-auto mb-4" />
+          <h2 className="text-xl sm:text-2xl font-bold mb-2">
+            Failed to load dashboard
+          </h2>
+          <p className="text-sm sm:text-base text-muted-foreground mb-4">
             Unable to fetch dashboard data
           </p>
           <Button onClick={() => window.location.reload()}>Try Again</Button>
@@ -185,27 +185,31 @@ const Dashboard = () => {
   } = dashboardData;
 
   return (
-    <div className="space-y-8 animate-fade-in relative">
+    <div className="space-y-4 sm:space-y-6 lg:space-y-8 animate-fade-in relative px-4 sm:px-6 lg:px-8">
       <LoadingOverlay isVisible={serviceLoading} currentService={service} />
 
-      <div className="space-y-8">
+      <div className="space-y-4 sm:space-y-6 lg:space-y-8 max-w-7xl mx-auto">
         <DashboardHeader />
-        
-        <CriticalAlert 
-          criticalAnomalies={criticalAnomalies} 
-          highPriorityAnomalies={highPriorityAnomalies} 
+
+        <CriticalAlert
+          criticalAnomalies={criticalAnomalies}
+          highPriorityAnomalies={highPriorityAnomalies}
         />
-        
-        <ServiceFilter 
-          currentService={service} 
-          onServiceChange={handleServiceChange} 
+
+        <ServiceFilter
+          currentService={service}
+          onServiceChange={handleServiceChange}
         />
-        <div className="grid gap-6 lg:grid-cols-3">
-          <AnomalyChart anomalyByMonth={dashboardData.anomalyByMonth} />
-          <WorkflowStatus 
-            anomaliesByStatus={anomaliesByStatus} 
-            totalAnomalies={totalAnomalies} 
-          />
+        <div className="grid gap-4 sm:gap-6 grid-cols-1 lg:grid-cols-2 xl:grid-cols-3">
+          <div className="lg:col-span-2 xl:col-span-2">
+            <AnomalyChart anomalyByMonth={dashboardData.anomalyByMonth} />
+          </div>
+          <div className="lg:col-span-2 xl:col-span-1">
+            <WorkflowStatus
+              anomaliesByStatus={anomaliesByStatus}
+              totalAnomalies={totalAnomalies}
+            />
+          </div>
         </div>
         <MaintenanceCalendar />
       </div>

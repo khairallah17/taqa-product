@@ -504,7 +504,6 @@
     "endDateTime": "End Date & Time",
     "progress": "Progress",
     "elapsed": "elapsed",
-    "estimatedWork": "Est. Work",
     "critical": "Critical",
     "anomaliesScheduledForWindow": "Anomalies scheduled for this maintenance window",
     "anomaly": "anomaly",

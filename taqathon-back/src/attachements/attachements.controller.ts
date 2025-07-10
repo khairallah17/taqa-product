@@ -38,7 +38,7 @@ import { PassPortJwtGuard } from 'src/auth/guards/jwt.guard';
 import { v4 as uuidv4 } from 'uuid';
 @Controller('attachements')
 @ApiTags('attachments')
-@UseGuards(PassPortJwtGuard)
+// @UseGuards(PassPortJwtGuard)
 export class AttachementsController {
   constructor(private readonly attachementsService: AttachementsService) {}
 

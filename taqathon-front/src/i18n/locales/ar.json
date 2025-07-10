@@ -504,7 +504,6 @@
     "endDateTime": "تاريخ ووقت النهاية",
     "progress": "التقدم",
     "elapsed": "منقضية",
-    "estimatedWork": "العمل المقدر",
     "critical": "حرج",
     "anomaliesScheduledForWindow": "الشذوذات المجدولة لنافذة الصيانة هذه",
     "anomaly": "شذوذ",

@@ -188,7 +188,7 @@ const Dashboard = () => {
     <div className="space-y-4 sm:space-y-6 lg:space-y-8 animate-fade-in relative px-4 sm:px-6 lg:px-8">
       <LoadingOverlay isVisible={serviceLoading} currentService={service} />
 
-      <div className="space-y-4 sm:space-y-6 lg:space-y-8 max-w-7xl mx-auto">
+      <div className="space-y-4 sm:space-y-6 lg:space-y-8 mx-auto">
         <DashboardHeader />
 
         <CriticalAlert

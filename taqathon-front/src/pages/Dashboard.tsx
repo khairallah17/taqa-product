@@ -201,15 +201,11 @@ const Dashboard = () => {
           onServiceChange={handleServiceChange}
         />
         <div className="grid gap-4 sm:gap-6 grid-cols-1 lg:grid-cols-2 xl:grid-cols-3">
-          <div className="lg:col-span-2 xl:col-span-2">
             <AnomalyChart anomalyByMonth={dashboardData.anomalyByMonth} />
-          </div>
-          <div className="lg:col-span-2 xl:col-span-1">
             <WorkflowStatus
               anomaliesByStatus={anomaliesByStatus}
               totalAnomalies={totalAnomalies}
             />
-          </div>
         </div>
         <MaintenanceCalendar />
       </div>

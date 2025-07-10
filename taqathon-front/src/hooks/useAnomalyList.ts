@@ -82,6 +82,7 @@ export const useAnomalyList = () => {
     if (serviceFilter !== "all") params.set("service", serviceFilter);
     if (shutdownFilter !== "all") params.set("shutdown", shutdownFilter);
     if (detectionDate) params.set("detectionDate", detectionDate.toISOString());
+    params.set("orderBy", "desc");
     
     setSearchParams(params);
   };

@@ -120,6 +120,10 @@ export const useAnomalyStore = create<AnomalyStore>((set, get) => ({
     params.set("page", (filters.page || get().page).toString());
     params.set("limit", (filters.limit || get().limit).toString());
 
+    // ascending orde
+    params.set("orderBy", "desc");
+    // params.set("criticality", "all");
+
     // Add filter parameters only if they have values
     if (filters.search) params.set("search", filters.search);
     if (filters.status && filters.status !== "all")
@@ -145,16 +149,16 @@ export const useAnomalyStore = create<AnomalyStore>((set, get) => ({
       const res = await apiClient.get(`/anomaly/search?${queryString}`);
       const { data, ...rest } = res.data;
 
-      console.log("✅ Anomaly search successful:", {
-        resultsCount: data?.length || 0,
-        filters: filters,
-        totalPages: rest.totalPages,
-        totalCount: rest.total,
-      });
+      // Sort data by criticality (highest first)
+      const sortedData = data?.sort((a: any, b: any) => {
+        const criticalityA = a.criticality || 0;
+        const criticalityB = b.criticality || 0;
+        return criticalityB - criticalityA;
+      }) || [];
 
       set({
-        anomalies: data,
-        anomaliesOLD: data,
+        anomalies: sortedData,
+        anomaliesOLD: sortedData,
         extraData: rest,
         loading: false,
       });

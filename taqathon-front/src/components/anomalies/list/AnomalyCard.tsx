@@ -30,6 +30,10 @@ export const AnomalyCard = ({
   t,
   language,
 }: AnomalyCardProps) => {
+
+  console.log(anomaly);
+  
+
   // Use user feedback metrics if available, otherwise use predicted metrics
   const disponibilityScore = anomaly.userFeedBack && anomaly.disponibility !== undefined 
     ? anomaly.disponibility 
@@ -42,11 +46,11 @@ export const AnomalyCard = ({
   const processSafetyScore = anomaly.userFeedBack && anomaly.processSafety !== undefined 
     ? anomaly.processSafety 
     : (anomaly.predictedProcessSafety || 0);
+    console.log('all bla : ',disponibilityScore, integrityScore, processSafetyScore);
+    
 
   const totalCriticality = 
-    Math.ceil(disponibilityScore) +
-    Math.ceil(integrityScore) +
-    Math.ceil(processSafetyScore);
+    Math.ceil(anomaly.userFeedBack ? anomaly.criticality : anomaly.predictionsData.Criticité)
   const criticalityLevel = getCriticalityFromTotal(totalCriticality);
 
   return (

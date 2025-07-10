@@ -322,7 +322,7 @@ export const useAnomalyStore = create<AnomalyStore>((set, get) => ({
         equipment: anomaly.equipment,
       });
 
-      const res = await apiClient.post("/anomaly", anomaly);
+      const res = await apiClient.post("/anomaly/create-with-prediction", anomaly);
 
       set({ anomalies: [...get().anomalies, res.data] });
     } catch (error: any) {

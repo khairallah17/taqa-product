@@ -96,18 +96,14 @@ export class AnomalyController {
     // Map the anomaly data to the expected format for the ML model
     const excelData = [
       {
-        description: anomalyData.description || '',
-        description_de_lequipement: anomalyData.equipementDescription || '',
-        systeme: anomalyData.system || '',
-        date_de_detection_de_lanomalie: anomalyData.detectionDate
+        'Section propriétaire': anomalyData.service || '',
+        "Description de l'équipement": anomalyData.equipementDescription || '',
+        "Date de détéction de l'anomalie": anomalyData.detectionDate
           ? new Date(anomalyData.detectionDate).toISOString()
           : new Date().toISOString(),
-        section_proprietaire: anomalyData.service || '',
-        num_equipement: anomalyData.equipment || '',
-        fiabilite_integrite: anomalyData.integrity || 0,
-        disponibilte: anomalyData.disponibility || 0,
-        process_safety: anomalyData.processSafety || 0,
-        criticite: anomalyData.criticality || 0,
+        Description: anomalyData.description || '',
+        Systeme: anomalyData.system || '',
+        Num_equipement: anomalyData.equipment || '',
       },
     ];
 

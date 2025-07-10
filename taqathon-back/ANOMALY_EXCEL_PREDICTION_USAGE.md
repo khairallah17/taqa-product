@@ -22,16 +22,12 @@ This document explains how to use the new anomaly creation endpoints that genera
 
 1. **Data Input**: You provide anomaly data in the standard format
 2. **Excel Generation**: The system converts your data to Excel format with these columns:
-   - `description`
-   - `description_de_lequipement`
-   - `systeme`
-   - `date_de_detection_de_lanomalie`
-   - `section_proprietaire`
-   - `num_equipement`
-   - `fiabilite_integrite`
-   - `disponibilte`
-   - `process_safety`
-   - `criticite`
+   - `Section propriétaire`
+   - `Description de l'équipement`
+   - `Date de détéction de l'anomalie`
+   - `Description`
+   - `Systeme`
+   - `Num_equipement`
 3. **ML Prediction**: Excel file is sent to `http://fastapi:3000/predict`
 4. **Data Enhancement**: Predictions are added to the anomaly data:
    - `predictedIntegrity`

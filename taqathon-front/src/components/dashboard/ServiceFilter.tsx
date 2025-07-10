@@ -27,7 +27,7 @@ export const ServiceFilter = ({
       <p className="text-lg sm:text-xl md:text-2xl lg:text-3xl font-medium text-black mb-3 sm:mb-4 md:mb-6">
         Filtre par métier :
       </p>
-      <div className="flex flex-wrap gap-2 sm:gap-3 md:gap-4 lg:gap-6 w-full items-center">
+      <div className="flex flex-wrap gap-6 w-full items-center">
         {services.map((service) => (
           <div
             key={service.id}

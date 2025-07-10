@@ -84,19 +84,10 @@ export const useAnomalyStore = create<AnomalyStore>((set, get) => ({
   getAnomalies: async () => {
     set({ loading: true });
     try {
-      console.log(`📊 Fetching anomalies: page=${get().page}, limit=${get().limit}`);
-      
       const res = await apiClient.get(
-        `/anomaly?page=${get().page}&limit=${get().limit}`,
+        `/anomaly?page=${get().page}&limit=${get().limit}&criticality=all`,
       );
       const { data, ...rest } = res.data;
-      
-      console.log("✅ Anomalies fetched successfully:", {
-        count: data?.length || 0,
-        page: get().page,
-        totalPages: rest.totalPages,
-        totalCount: rest.totalCount,
-      });
 
       set({
         anomalies: data,
@@ -113,7 +104,7 @@ export const useAnomalyStore = create<AnomalyStore>((set, get) => ({
         page: get().page,
         limit: get().limit,
       });
-      
+
       toast("Error fetching anomalies");
       set({ loading: false });
     }
@@ -121,24 +112,28 @@ export const useAnomalyStore = create<AnomalyStore>((set, get) => ({
 
   searchAnomalies: async (filters) => {
     set({ loading: true });
-    
+
     // Build query parameters
     const params = new URLSearchParams();
-    
+
     // Add pagination
     params.set("page", (filters.page || get().page).toString());
     params.set("limit", (filters.limit || get().limit).toString());
-    
+
     // Add filter parameters only if they have values
     if (filters.search) params.set("search", filters.search);
-    if (filters.status && filters.status !== "all") params.set("status", filters.status);
+    if (filters.status && filters.status !== "all")
+      params.set("status", filters.status);
     if (filters.description) params.set("description", filters.description);
     if (filters.equipment) params.set("equipment", filters.equipment);
     if (filters.system) params.set("system", filters.system);
-    if (filters.service && filters.service !== "all") params.set("service", filters.service);
-    if (filters.sysShutDownRequired !== undefined) params.set("sysShutDownRequired", filters.sysShutDownRequired.toString());
-    if (filters.detectionDate) params.set("detectionDate", filters.detectionDate);
-    
+    if (filters.service && filters.service !== "all")
+      params.set("service", filters.service);
+    if (filters.sysShutDownRequired !== undefined)
+      params.set("sysShutDownRequired", filters.sysShutDownRequired.toString());
+    if (filters.detectionDate)
+      params.set("detectionDate", filters.detectionDate);
+
     const queryString = params.toString();
     console.log(`🔍 Searching anomalies with filters:`, {
       filters,
@@ -172,7 +167,7 @@ export const useAnomalyStore = create<AnomalyStore>((set, get) => ({
         filters,
         queryParams: queryString,
       });
-      
+
       toast("Error searching anomalies");
       set({ loading: false });
     }
@@ -279,17 +274,20 @@ export const useAnomalyStore = create<AnomalyStore>((set, get) => ({
     if (criticalityFilter !== "all") {
       filtered = filtered.filter((anomaly) => {
         // Use user feedback metrics if available, otherwise use predicted metrics
-        const disponibilityScore = anomaly.userFeedBack && anomaly.disponibility !== undefined 
-          ? anomaly.disponibility 
-          : (anomaly.predictedDisponibility || 0);
-        
-        const integrityScore = anomaly.userFeedBack && anomaly.integrity !== undefined 
-          ? anomaly.integrity 
-          : (anomaly.predictedIntegrity || 0);
-        
-        const processSafetyScore = anomaly.userFeedBack && anomaly.processSafety !== undefined 
-          ? anomaly.processSafety 
-          : (anomaly.predictedProcessSafety || 0);
+        const disponibilityScore =
+          anomaly.userFeedBack && anomaly.disponibility !== undefined
+            ? anomaly.disponibility
+            : anomaly.predictedDisponibility || 0;
+
+        const integrityScore =
+          anomaly.userFeedBack && anomaly.integrity !== undefined
+            ? anomaly.integrity
+            : anomaly.predictedIntegrity || 0;
+
+        const processSafetyScore =
+          anomaly.userFeedBack && anomaly.processSafety !== undefined
+            ? anomaly.processSafety
+            : anomaly.predictedProcessSafety || 0;
 
         const totalCriticality =
           Math.ceil(disponibilityScore) +
@@ -323,14 +321,9 @@ export const useAnomalyStore = create<AnomalyStore>((set, get) => ({
         service: anomaly.service,
         equipment: anomaly.equipment,
       });
-      
+
       const res = await apiClient.post("/anomaly", anomaly);
-      
-      console.log(`✅ Anomaly added successfully:`, {
-        anomalyId: res.data.id,
-        title: res.data.title,
-      });
-      
+
       set({ anomalies: [...get().anomalies, res.data] });
     } catch (error: any) {
       console.error("❌ Error adding anomaly:", {
@@ -346,16 +339,16 @@ export const useAnomalyStore = create<AnomalyStore>((set, get) => ({
   getAnomalyById: async (id: string) => {
     try {
       console.log(`🔍 Fetching anomaly by ID: ${id}`);
-      
+
       const res = await apiClient.get(`/anomaly/${id}`);
-      
+
       console.log(`✅ Anomaly fetched successfully:`, {
         anomalyId: id,
         title: res.data.title,
         status: res.data.status,
         service: res.data.responsibleSection,
       });
-      
+
       set({ anomaly: res.data });
     } catch (error: any) {
       console.error(`❌ Error fetching anomaly ${id}:`, {
@@ -430,9 +423,8 @@ export const useAnomalyStore = create<AnomalyStore>((set, get) => ({
         payload.closedAt = currentDateTime;
       }
 
-
       const res = await apiClient.patch(`/anomaly/${anomaly.id}`, payload);
-      
+
       const newAnomaly = res.data;
 
       const anomalies = get().anomalies;
@@ -454,14 +446,15 @@ export const useAnomalyStore = create<AnomalyStore>((set, get) => ({
         getMaintenanceWindowsNotSafe,
       } = useMaintenanceStore.getState();
 
-
       if (maintenanceWindows.length > 0) {
         if (sysShutDownRequired) {
-          getMaintenanceWindowsNotSafe()
+          getMaintenanceWindowsNotSafe();
           return;
         }
         const updatedAnomaly = maintenanceWindows.map((window) => {
-          if (window.id.toString() === anomaly?.maintenanceWindowId?.toString()) {
+          if (
+            window.id.toString() === anomaly?.maintenanceWindowId?.toString()
+          ) {
             return {
               ...window,
               anomalies: [...window.anomalies, anomaly],
@@ -484,7 +477,7 @@ export const useAnomalyStore = create<AnomalyStore>((set, get) => ({
           sysShutDownRequired,
         },
       });
-      
+
       toast.error("Failed to update anomaly");
       throw error;
     }
@@ -523,12 +516,12 @@ export const useAnomalyStore = create<AnomalyStore>((set, get) => ({
       });
 
       const res = await apiClient.patch(`/anomaly/${anomalyId}`, payload);
-      
+
       console.log(`✅ Anomaly ${anomalyId} edited successfully:`, {
         anomalyId,
         responseData: res.data,
       });
-      
+
       // Update the anomaly in the local state
       const anomalies = get().anomalies;
       const anomaliesOLD = get().anomaliesOLD;
@@ -566,7 +559,7 @@ export const useAnomalyStore = create<AnomalyStore>((set, get) => ({
         responseData: error.response?.data,
         updateData,
       });
-      
+
       toast.error("Failed to update anomaly");
       throw error;
     }

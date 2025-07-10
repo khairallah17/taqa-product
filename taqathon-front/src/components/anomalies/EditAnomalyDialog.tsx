@@ -1,5 +1,8 @@
 import { useEffect } from "react";
-import { useAnomalyTranslations, useCommonTranslations } from "@/i18n/hooks/useTranslations";
+import {
+  useAnomalyTranslations,
+  useCommonTranslations,
+} from "@/i18n/hooks/useTranslations";
 import { useAnomalyStore } from "@/(zustand)/useAnomalyStore";
 import { Anomaly } from "@/types/anomaly";
 import {
@@ -33,7 +36,8 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { toast } from "sonner";
 
 const editAnomalySchema = z.object({
-  description: z.string()
+  description: z
+    .string()
     .min(10, "Description must be at least 10 characters")
     .max(1000, "Description cannot exceed 1000 characters"),
   equipment: z.string().min(1, "Equipment is required"),
@@ -42,7 +46,8 @@ const editAnomalySchema = z.object({
   status: z.enum(["IN_PROGRESS", "TREATED", "CLOSED"], {
     required_error: "Please select a status",
   }),
-  estimatedTime: z.number()
+  estimatedTime: z
+    .number()
     .min(0, "Estimated time cannot be negative")
     .max(1000, "Estimated time cannot exceed 1000 hours")
     .optional(),
@@ -57,22 +62,28 @@ interface EditAnomalyDialogProps {
   anomaly: Anomaly | null;
 }
 
-export const EditAnomalyDialog = ({ open, onOpenChange, anomaly }: EditAnomalyDialogProps) => {
+export const EditAnomalyDialog = ({
+  open,
+  onOpenChange,
+  anomaly,
+}: EditAnomalyDialogProps) => {
   const anomalyT = useAnomalyTranslations();
   const commonT = useCommonTranslations();
   const { editAnomaly, getAnomalyById } = useAnomalyStore();
 
   // Helper function to normalize status values
-  const normalizeStatus = (status: string): "IN_PROGRESS" | "TREATED" | "CLOSED" => {
+  const normalizeStatus = (
+    status: string,
+  ): "IN_PROGRESS" | "TREATED" | "CLOSED" => {
     const statusMap: Record<string, "IN_PROGRESS" | "TREATED" | "CLOSED"> = {
-      "open": "IN_PROGRESS",
+      open: "IN_PROGRESS",
       "in-progress": "IN_PROGRESS",
-      "IN_PROGRESS": "IN_PROGRESS",
-      "traitee": "TREATED", 
-      "TREATED": "TREATED",
-      "cloture": "CLOSED",
-      "closed": "CLOSED",
-      "CLOSED": "CLOSED"
+      IN_PROGRESS: "IN_PROGRESS",
+      traitee: "TREATED",
+      TREATED: "TREATED",
+      cloture: "CLOSED",
+      closed: "CLOSED",
+      CLOSED: "CLOSED",
     };
     return statusMap[status] || "IN_PROGRESS";
   };
@@ -102,15 +113,16 @@ export const EditAnomalyDialog = ({ open, onOpenChange, anomaly }: EditAnomalyDi
       status: "IN_PROGRESS",
       estimatedTime: 0,
       sysShutDownRequired: false,
-    }
+    },
   });
 
   useEffect(() => {
     if (anomaly) {
-      const equipmentName = typeof anomaly.equipment === 'string' 
-        ? anomaly.equipment 
-        : anomaly.equipment?.name || '';
-        
+      const equipmentName =
+        typeof anomaly.equipment === "string"
+          ? anomaly.equipment
+          : anomaly.equipment?.name || "";
+
       form.reset({
         description: anomaly.description,
         equipment: equipmentName,
@@ -157,7 +169,9 @@ export const EditAnomalyDialog = ({ open, onOpenChange, anomaly }: EditAnomalyDi
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[500px] max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle className="text-xl font-semibold">{anomalyT.editAnomaly}</DialogTitle>
+          <DialogTitle className="text-xl font-semibold">
+            {anomalyT.editAnomaly}
+          </DialogTitle>
         </DialogHeader>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
@@ -167,9 +181,15 @@ export const EditAnomalyDialog = ({ open, onOpenChange, anomaly }: EditAnomalyDi
                 name="equipment"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-base font-medium">{anomalyT.equipment}</FormLabel>
+                    <FormLabel className="text-base font-medium">
+                      {anomalyT.equipment}
+                    </FormLabel>
                     <FormControl>
-                      <Input {...field} placeholder="Enter equipment name..." className="h-11" />
+                      <Input
+                        {...field}
+                        placeholder="Enter equipment name..."
+                        className="h-11"
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -181,9 +201,15 @@ export const EditAnomalyDialog = ({ open, onOpenChange, anomaly }: EditAnomalyDi
                 name="system"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-base font-medium">System</FormLabel>
+                    <FormLabel className="text-base font-medium">
+                      System
+                    </FormLabel>
                     <FormControl>
-                      <Input {...field} placeholder="Enter system..." className="h-11" />
+                      <Input
+                        {...field}
+                        placeholder="Enter system..."
+                        className="h-11"
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -195,9 +221,14 @@ export const EditAnomalyDialog = ({ open, onOpenChange, anomaly }: EditAnomalyDi
                 name="service"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-base font-medium">Service</FormLabel>
+                    <FormLabel className="text-base font-medium">
+                      Service
+                    </FormLabel>
                     <FormControl>
-                      <Select onValueChange={field.onChange} defaultValue={field.value}>
+                      <Select
+                        onValueChange={field.onChange}
+                        defaultValue={field.value}
+                      >
                         <SelectTrigger className="h-11">
                           <SelectValue placeholder="Select service..." />
                         </SelectTrigger>
@@ -220,9 +251,17 @@ export const EditAnomalyDialog = ({ open, onOpenChange, anomaly }: EditAnomalyDi
                 name="description"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-base font-medium">{anomalyT.description}</FormLabel>
+                    <FormLabel className="text-base font-medium">
+                      {anomalyT.description}
+                    </FormLabel>
                     <FormControl>
-                      <Textarea {...field} maxLength={1000} rows={4} className="resize-none" placeholder="Enter detailed description..." />
+                      <Textarea
+                        {...field}
+                        maxLength={1000}
+                        rows={4}
+                        className="resize-none"
+                        placeholder="Enter detailed description..."
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -235,12 +274,20 @@ export const EditAnomalyDialog = ({ open, onOpenChange, anomaly }: EditAnomalyDi
                   name="estimatedTime"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-base font-medium">{anomalyT.estimatedTime} (hours)</FormLabel>
+                      <FormLabel className="text-base font-medium">
+                        {anomalyT.estimatedTime} (hours)
+                      </FormLabel>
                       <FormControl>
-                        <Input 
-                          type="number" 
-                          {...field} 
-                          onChange={e => field.onChange(e.target.value ? Number(e.target.value) : undefined)} 
+                        <Input
+                          type="number"
+                          {...field}
+                          onChange={(e) =>
+                            field.onChange(
+                              e.target.value
+                                ? Number(e.target.value)
+                                : undefined,
+                            )
+                          }
                           placeholder="Enter estimated time..."
                           className="h-11"
                         />
@@ -255,18 +302,26 @@ export const EditAnomalyDialog = ({ open, onOpenChange, anomaly }: EditAnomalyDi
                   name="status"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-base font-medium">{anomalyT.status}</FormLabel>
-                      <Select onValueChange={field.onChange} defaultValue={field.value}>
+                      <FormLabel className="text-base font-medium">
+                        {anomalyT.status}
+                      </FormLabel>
+                      <Select
+                        onValueChange={field.onChange}
+                        defaultValue={field.value}
+                      >
                         <FormControl>
                           <SelectTrigger className="h-11">
                             <SelectValue placeholder={anomalyT.selectStatus} />
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
-                          {getAllowedStatuses(anomaly?.status || "IN_PROGRESS").map((status) => (
+                          {getAllowedStatuses(
+                            anomaly?.status || "IN_PROGRESS",
+                          ).map((status) => (
                             <SelectItem key={status} value={status}>
                               {status === "IN_PROGRESS" && anomalyT.statusOpen}
-                              {status === "TREATED" && anomalyT.statusInProgress}
+                              {status === "TREATED" &&
+                                anomalyT.statusInProgress}
                               {status === "CLOSED" && anomalyT.statusResolved}
                             </SelectItem>
                           ))}
@@ -290,7 +345,9 @@ export const EditAnomalyDialog = ({ open, onOpenChange, anomaly }: EditAnomalyDi
                       />
                     </FormControl>
                     <div className="space-y-1 leading-none">
-                      <FormLabel className="text-base font-medium">{anomalyT.systemShutdownRequired}</FormLabel>
+                      <FormLabel className="text-base font-medium">
+                        {anomalyT.systemShutdownRequired}
+                      </FormLabel>
                     </div>
                     <FormMessage />
                   </FormItem>
@@ -299,16 +356,20 @@ export const EditAnomalyDialog = ({ open, onOpenChange, anomaly }: EditAnomalyDi
             </div>
 
             <div className="flex justify-end space-x-3 pt-6 border-t">
-              <Button 
-                type="button" 
-                variant="outline" 
+              <Button
+                type="button"
+                variant="outline"
                 onClick={() => onOpenChange(false)}
                 disabled={form.formState.isSubmitting}
                 className="px-6"
               >
                 {commonT.cancel}
               </Button>
-              <Button type="submit" disabled={form.formState.isSubmitting} className="px-6">
+              <Button
+                type="submit"
+                disabled={form.formState.isSubmitting}
+                className="px-6"
+              >
                 {form.formState.isSubmitting ? "Saving..." : commonT.save}
               </Button>
             </div>

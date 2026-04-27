@@ -17,14 +17,12 @@ import { ApiTags } from '@nestjs/swagger';
 
 @Controller('maintenance-windows')
 @ApiTags('maintenance-windows')
-// @ApiBearerAuth()
 @UseGuards(PassPortJwtGuard)
 export class MaintenanceWindowsController {
   constructor(
     private readonly maintenanceWindowsService: MaintenanceWindowsService
   ) {}
 
-  // @UseGuards(PassPortJwtGuard)
   @Post()
   async create(
     @Body() createMaintenanceWindowDto: Prisma.MaintenanceWindowsCreateInput
@@ -34,7 +32,6 @@ export class MaintenanceWindowsController {
         createMaintenanceWindowDto
       );
     } catch (e: unknown) {
-      console.log(e);
       if (
         e instanceof Error &&
         e.message.includes('Cannot create maintenance window')
@@ -48,13 +45,12 @@ export class MaintenanceWindowsController {
     }
   }
 
-  // @UseGuards(PassPortJwtGuard)
   @Get()
   async findAll() {
     try {
       return await this.maintenanceWindowsService.findAll();
     } catch (e: unknown) {
-      console.log(e);
+      console.error('Failed to fetch maintenance windows:', e);
       throw new HttpException(
         'Failed to fetch maintenance windows',
         HttpStatus.INTERNAL_SERVER_ERROR
@@ -67,13 +63,12 @@ export class MaintenanceWindowsController {
     return await this.maintenanceWindowsService.count();
   }
 
-  // @UseGuards(PassPortJwtGuard)
   @Get(':id')
   async findOne(@Param('id') id: string) {
     try {
       return await this.maintenanceWindowsService.findOne(+id);
     } catch (e: unknown) {
-      console.log(e);
+      console.error('Failed to fetch maintenance window:', e);
       throw new HttpException(
         'Failed to fetch maintenance window',
         HttpStatus.NOT_FOUND
@@ -81,7 +76,6 @@ export class MaintenanceWindowsController {
     }
   }
 
-  // @UseGuards(PassPortJwtGuard)
   @Patch(':id')
   async update(
     @Param('id') id: string,
@@ -93,7 +87,6 @@ export class MaintenanceWindowsController {
         updateMaintenanceWindowDto
       );
     } catch (e: unknown) {
-      console.log(e);
       if (
         e instanceof Error &&
         e.message.includes('Cannot update maintenance window')
@@ -113,7 +106,6 @@ export class MaintenanceWindowsController {
     }
   }
 
-  // @UseGuards(PassPortJwtGuard)
   @Patch(':id/anomalies')
   async addAnomalies(
     @Param('id') id: string,
@@ -125,7 +117,7 @@ export class MaintenanceWindowsController {
         body.anomalyIds
       );
     } catch (e: unknown) {
-      console.log(e);
+      console.error('Failed to add anomalies to maintenance window:', e);
       throw new HttpException(
         'Failed to add anomalies',
         HttpStatus.BAD_REQUEST
@@ -133,7 +125,6 @@ export class MaintenanceWindowsController {
     }
   }
 
-  // @UseGuards(PassPortJwtGuard)
   @Delete(':id/anomalies')
   async delAnomalies(
     @Param('id') id: string,
@@ -145,21 +136,20 @@ export class MaintenanceWindowsController {
         body.anomalyIds
       );
     } catch (e: unknown) {
-      console.log(e);
+      console.error('Failed to remove anomalies from maintenance window:', e);
       throw new HttpException(
-        'Failed to add anomalies',
+        'Failed to remove anomalies',
         HttpStatus.BAD_REQUEST
       );
     }
   }
 
-  // @UseGuards(PassPortJwtGuard)
   @Delete(':id')
   async remove(@Param('id') id: string) {
     try {
       return await this.maintenanceWindowsService.remove(+id);
     } catch (e: unknown) {
-      console.log(e);
+      console.error('Failed to delete maintenance window:', e);
       throw new HttpException(
         'Failed to delete maintenance window',
         HttpStatus.BAD_REQUEST

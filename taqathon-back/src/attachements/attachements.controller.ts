@@ -385,7 +385,7 @@ export class AttachementsController {
         };
       throw new Error('error in saving attachement');
     } catch (error: unknown) {
-      console.log('error', error);
+      console.error('Action plan attachment error:', error);
     }
     return null;
   }

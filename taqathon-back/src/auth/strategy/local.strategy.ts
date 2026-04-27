@@ -12,7 +12,6 @@ export class LocalStrategy extends PassportStrategy(Strategy) {
   async validate(username: string, password: string): Promise<any> {
     // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
     const user = await this.authService.authenticate(username, password);
-    console.log(username);
     if (!user) {
       throw new UnauthorizedException('not in database');
     }

@@ -22,11 +22,9 @@ export class UserController {
   @ApiBody({ type: CreateUserDto })
   async create(@Body() createUserDto: Prisma.UserCreateInput) {
     try {
-      const createdUser = await this.userService.create(createUserDto);
-      console.log('created user is', createdUser);
-      return createdUser;
+      return await this.userService.create(createUserDto);
     } catch (error: unknown) {
-      console.log(error);
+      console.error('Failed to create user:', error);
     }
   }
 

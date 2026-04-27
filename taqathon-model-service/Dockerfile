@@ -21,7 +21,6 @@ COPY requirements.txt ./
 
 # Install Python dependencies
 RUN pip install --no-cache-dir --upgrade pip && \
-    pip install --no-cache-dir numpy && \
     pip install --no-cache-dir -r requirements.txt
 
 # Copy application code
@@ -34,8 +33,6 @@ USER appuser
 
 # Expose port
 EXPOSE 3000
-
-
 
 # Run the application
 CMD ["uvicorn", "server:app", "--host", "0.0.0.0", "--port", "3000"]

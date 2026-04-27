@@ -58,7 +58,7 @@ export class AttachementsService {
       writeFileSync(path, payload);
       return true;
     } catch (error: unknown) {
-      console.log('error', error);
+      console.error('Failed to save file:', error);
       return false;
     }
   }

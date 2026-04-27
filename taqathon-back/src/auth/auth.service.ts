@@ -11,8 +11,6 @@ export class AuthService {
   ) {}
 
   async validatePassWord(hashedPass: string, rawPass: string) {
-    if (await bcrypt.compare(rawPass, hashedPass)) console.log('good');
-    else console.log('not good');
     return await bcrypt.compare(rawPass, hashedPass);
   }
 
@@ -41,7 +39,6 @@ export class AuthService {
       sub: user.id,
       userName: user.userName,
     };
-    console.log(payload);
 
     const accessToken = await this.jwtService.signAsync(payload);
     return { accessToken, userName: user.userName, id: user.id };

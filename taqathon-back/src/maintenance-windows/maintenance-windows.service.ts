@@ -184,22 +184,15 @@ export class MaintenanceWindowsService {
         // title: true,
       },
     });
-    console.log(id, anomalyIds);
     if (anomalies.length === 0) {
       throw new Error(
         `No anomalies found in maintenance window ${id} with the provided IDs`
       );
     }
 
-    // Calculate total estimated time being removed
     const totalEstimatedTime = anomalies.reduce((total, anomaly) => {
       return total + (anomaly.estimatedTime || 0);
     }, 0);
-
-    console.log(
-      `Removing ${anomalies.length} anomalies with total estimated time: ${totalEstimatedTime} hours`
-    );
-    console.log(`Anomalies being removed:`, anomalies);
 
     // Disconnect anomalies from maintenance window
     const result = await this.prismaService.maintenanceWindows.update({
@@ -344,7 +337,6 @@ export class MaintenanceWindowsService {
         return timeB - timeA;
       });
     const maintenanceWindows = await this.findAll();
-    // console.log(`updateAnomaliesMaintenanceWindow called :${maintenanceWindows}`)
     for (const maintenanceWindow of maintenanceWindows) {
       const time =
         (new Date(maintenanceWindow.scheduleEnd).getTime() -
@@ -358,7 +350,6 @@ export class MaintenanceWindowsService {
         if (anomaly.estimatedTime && anomaly.estimatedTime <= time) {
           anomaliesToAssign.push(anomaly.id);
           filteredAnomalies.splice(i, 1);
-          // time -= anomaly.estimatedTime;
         } else {
           i++;
         }
@@ -383,7 +374,6 @@ export class MaintenanceWindowsService {
           },
         });
       }
-      console.log(`${maintenanceWindow.id} : ${anomaliesToAssign}`);
     }
   }
 }

@@ -622,7 +622,6 @@ export class AnomalyController {
             : 'No filters applied',
       };
 
-      console.log(ret_1);
       ret_obj['totalAnomalies'] = ret_1.length;
       ret_obj['openAnomalies'] = ret_1.filter(
         (o) => o.status !== 'CLOSED'
@@ -674,7 +673,6 @@ export class AnomalyController {
         }
         anomaliesByUnit[equipment] += 1;
       });
-      console.log('Anomalies by unit:', anomaliesByUnit);
       ret_obj['anomaliesByUnit'] = anomaliesByUnit;
       ret_obj['safetyImpactMetrics'] = {
         noRisk: ret_1.filter((o) => o.criticality! >= 3 && o.criticality! <= 6)
@@ -939,7 +937,6 @@ export class AnomalyController {
   @UseInterceptors(FileInterceptor('file'))
   async anomaly_file_submittion(@UploadedFile() file: Express.Multer.File) {
     try {
-      console.log('file', file);
       const formData = new FormData();
       formData.append('file', new Blob([file.buffer]), file.originalname);
       const axios_ret = await axios.post(
@@ -951,7 +948,6 @@ export class AnomalyController {
           },
         }
       );
-      console.log(axios_ret.data);
 
       // Check if FastAPI returned an error
       if (axios_ret.data.error) {
@@ -1020,8 +1016,6 @@ export class AnomalyController {
 
           const savedAnomaly = await this.anomalyService.create(anomalyData);
           savedAnomalies.push(savedAnomaly);
-
-          console.log(`Anomaly saved with ID: ${savedAnomaly.id}`);
         } catch (error) {
           console.error('Error saving individual anomaly:', error);
           // Continue processing other anomalies even if one fails
@@ -1036,12 +1030,9 @@ export class AnomalyController {
         totalSaved: savedAnomalies.length,
       };
     } catch (error: any) {
-      console.log('error', error);
-
       if (error instanceof BadRequestException) {
         throw error;
       }
-
       throw new InternalServerErrorException(
         `Failed to process file: ${error.message || 'Unknown error'}`
       );
@@ -1149,7 +1140,6 @@ export class AnomalyController {
       if (predictions['Criticité']) {
         anomalyData.criticality = predictions['Criticité'];
       }
-      console.log(anomalyData);
       const savedAnomaly = await this.anomalyService.create(anomalyData);
 
       return {

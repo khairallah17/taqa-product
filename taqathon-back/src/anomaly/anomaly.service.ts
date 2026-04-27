@@ -404,27 +404,13 @@ export class AnomalyService {
       throw new NotFoundException(`Anomaly with ID ${id} not found`);
     }
 
-    // ✅ Check if the status is being updated to COMPLETED
-    const isStatusClosed =
-      typeof updateAnomalyDto.status === 'object' &&
-      updateAnomalyDto.status?.set === AStatus.CLOSED;
-
-    if (isStatusClosed) {
-      console.log(`Anomaly ${id} is being marked as COMPLETED.`);
-      // Add your custom logic for COMPLETED status here
-    }
-
-    // Check if sysShutDownRequired is being set to false
+    // Disconnect from maintenance window when shutdown is no longer required
     const isSettingShutDownToFalse =
       updateAnomalyDto.sysShutDownRequired === false;
 
     if (isSettingShutDownToFalse && currentAnomaly.maintenanceWindowId) {
       updateAnomalyDto.maintenanceWindow = { disconnect: true };
       updateAnomalyDto.forcedAssigned = true;
-
-      console.log(
-        `Removing anomaly ${id} from maintenance window ${currentAnomaly.maintenanceWindowId} due to sysShutDownRequired = false`
-      );
     }
 
     const updateAnomaly = await this.prismaService.anomaly.update({

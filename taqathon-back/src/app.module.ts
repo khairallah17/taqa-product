@@ -6,7 +6,6 @@ import { UserModule } from './user/user.module';
 import { AuthModule } from './auth/auth.module';
 import { AuthService } from './auth/auth.service';
 import { JwtModule } from '@nestjs/jwt';
-// import { PassportAuthController } from './auth/passport-auth.controller';
 import { JwtStrategy } from './auth/strategy/jwt.strategy';
 import { PassportModule } from '@nestjs/passport';
 import { AnomalyModule } from './anomaly/anomaly.module';

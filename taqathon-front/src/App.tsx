@@ -35,7 +35,6 @@ const ProtectedRoute = ({ children }) => {
   return children;
 };
 
-// Updated App.jsx
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
@@ -65,18 +64,9 @@ const App = () => (
               element={<MaintenanceWindowDetails />}
             />
 
-            {/* Placeholder routes - will be implemented in future iterations */}
             <Route path="anomalies/:id" element={<AnomalyDetails />} />
             <Route path="equipment" element={<Rex />} />
             <Route path="rex" element={<Rex />} />
-            <Route
-              path="reports"
-              element={
-                <div className="p-6 text-center text-muted-foreground">
-                  {/* Reports & Analytics - Coming Soon */}
-                </div>
-              }
-            />
             <Route path="settings" element={<Settings />} />
           </Route>
 

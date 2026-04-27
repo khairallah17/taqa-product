@@ -7,7 +7,6 @@ import * as bcrypt from 'bcrypt';
 export class UserService {
   constructor(private readonly prisma: PrismaService) {}
   async encryptPassword(rawPassWord: string) {
-    console.log(rawPassWord);
     return await bcrypt.hash(rawPassWord, 10);
   }
   async create(createUserDto: Prisma.UserCreateInput) {
@@ -40,7 +39,7 @@ export class UserService {
         return [];
       }
     } catch (error: unknown) {
-      console.log('error message is:', error);
+      console.error('Failed to fetch users:', error);
     }
   }
 
